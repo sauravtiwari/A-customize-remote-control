@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title></title>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+</head>
+<body>
+  <button id="close" style="float:right"> X </button>
+  <!--  <button id="setting" style="float:right">setting</button> -->
+
+  <div id="contolbtn">
+  <div id="btn">
+    <button type="button"style="float:right;position:top">save</button>
+  </div>
+  <div id="btn2">
+  <button type="button"style="float:right;position:top">add new div</button>
+  </div>
+  </div>
+
+  <!--<div id="divresult"></div>-->
+  <div id="test"> </div>
+
+  <div id="load" style="width: 1000px; height: 1000px;background-color:#d3abcc;" style="-moz-user-select: none; -webkit-user-select: none; -ms-user-select:none; user-select:none;-o-user-select:none;"
+   unselectable="on"
+   onselectstart="return false;">
+   <div id="marker" style="border: 2px solid #f44248;width:50px;float:right">nbsp;</div>
+   <img id="minions" src="photos/images.jpg" style="width:50px;height:50px">
+  </div>
+
+  <div id="to_the_top_of_load" style="position:absolute;width:1100px;height:1100px;top:0px;left:0px;background-color:rgba(144,177,229,0.3)">
+   <button id="edit" style="position:absolute; top:120px; left:110px">edit</button>
+   <button id="back" style="position:absolute; top:145px; left:110px">back<button>
+  </div>
+
+  <div id="pageofclickedbutton" style="position:absolute;width:1000px; height:1000px;background-color:rgba(244, 113, 66,0.9);opacity:0.9">
+  <div id="pageofclickedbutton_2" style="width:80%;margin:auto;margin-top:10%;height:80%;background-color:rgba(255,255,255,1);">
+  <div id="button_property"></div>
+  <button type="button" style="float:right;position:top">X</button>
+  <button type="button" style="float:right;position:top">save</button>
+  <form>
+  <input id="text" type="radio"  name="type" value="text" > Text<br>
+  <input id="image" type="radio" name="type" value="image"> Image<br>
+  <input id="other" type="radio" name="type" value="other" checked> Other<br>
+  </form>
+  <div id="result" style="width:80%;margin:auto;margin-top:10%;height:80%;background-color:rgba(289,259,268,1);"></div>
+  </div>
+  </div>
+
+<style>
+  .myclass
+  {
+     top:"60px";
+     left:"120px";
+     /*height:"60px",
+     width : "90px",
+     border-style: solid;*/
+     border: 5px solid black;
+  }
+</style>
+
+<script type="text/javascript">
+var json;
+
+function loopjson()
+{
+  var i;
+  $('.myclass').remove();
+  for(i = 0; i<json.buttons.length;i++)
+  {
+    result = 0;
+    result = json.buttons[i].top  + ', ';
+    console.log(result);
+    //var x =  $("<div>test</div>");
+    $("#load").append("<div id='"+json.buttons[i].id+"' class='myclass'>test</div>");
+
+  //  $('#load').data('myval'); //getter
+    $('#'+json.buttons[i].id).attr("index",i);
+
+    moveid = json.buttons[i].id;
+    click_id = json.buttons[i].id;
+
+    $("#"+json.buttons[i].id).css({
+        top: json.buttons[i].top,
+        position:"absolute",
+        left :json.buttons[i].left,
+        width : json.buttons[i].width,
+        height: json.buttons[i].height,
+      //  left : ((Math.random() * $('#load').width())),
+      //  top : ((Math.random() * $('#load').height()))
+    });
+
+    $("#"+json.buttons[i].id).mousedown(to_do_on_mousedown);
+    // $("#"+json.buttons[i]).data('index',i);
+
+    //$.post('/abc',{name:"bharat",nameofid:JSON.stringify(json.buttons[i].id)},on_response_for_abc);
+
+  //  $.post('/abc',{left:JSON.stringify(json.buttons[i].left),top:JSON.stringify(json.buttons[i].top)},to_do_on_mouseup);
+  }
+
+}
+
+
+ $(document).ready(function(){
+   var moveid;
+   var getindex;
+   var move;
+   $.getJSON( "index.json", function(jsonp) {
+      json = jsonp;
+
+      console.log(json.buttons.length);
+      console.log(json.buttons[1]);
+      console.log(json.buttons[2].top);
+      loopjson();
+      //$.post('/abc',{name :"bharat",a:"1",test:JSON.stringify(json),nameofid:JSON.stringify(json.buttons.id)},on_response_for_abc);
+      console.log(json);
+
+});
+});
+
+var editmode = false;
+ var leftdiffrnce , topdiffrnce;
+ var width;
+ var what_to_do_on_mouse_move = "";
+ var current_top_position , current_left_position;
+
+ function to_do_on_mousedown(e)
+ {
+   if(editmode == true)
+   {
+   moveid = $(this).attr("id");
+   console.log(moveid);
+   //console.log("hello mouse down");
+   var divposition = $(this).position();
+   leftdiffrnce =  e.pageX - divposition.left;
+   topdiffrnce =   e.pageY - divposition.top;
+
+   setmarker();
+
+   //console.log("top position" + divposition.top + "   "+"left position" + divposition.left);
+   what_to_do_on_mouse_move = "move_button";
+   width = $("#"+moveid).css("width");
+   //console.log(width);
+   width = $("#"+moveid).width();
+   //console.log(width);
+   var position = e.pageX - this.offsetLeft;
+   //console.log(position);
+   var percentage_x =  (position/width);
+
+   var height = $("#"+moveid).height();
+   //console.log(height);
+
+   var position_y = e.pageY - this.offsetTop;
+
+   var percentage_y = (position_y/height);
+   console.log(percentage_y);
+
+   if(percentage_x>0.9)
+   {
+     what_to_do_on_mouse_move = "resize_rt_button";
+   }
+   else if(percentage_x<0.1)
+   {
+     what_to_do_on_mouse_move = "resize_lt_button";
+   }
+
+   else if(percentage_y > (0.90) && percentage_y < (1.13))
+   {
+     what_to_do_on_mouse_move = "resize_dwn_button";
+   }
+   else if(percentage_y < 0.15)
+   {
+     what_to_do_on_mouse_move = "resize_up_button";
+   }
+
+   else
+   {
+     what_to_do_on_mouse_move = "move_button";
+   }
+
+   //console.log('percentage : '+percentage);
+   //  $("#load").append(x);
+   //x.attr("id","myid");
+   //x.attr("class","ans");
+
+   //$("#pageofclickedbutton").show();
+   //document.getElementById('pageofclickedbutton').innerHTML = (width + " " + height + " " + moveid);
+   //alternate method using jquery
+   //$('#pageofclickedbutton').html(width + " " + height + " " + moveid);
+   current_top_position = $("#"+moveid).offset().top;
+   current_left_position = $("#"+moveid).offset().left;
+   console.log(current_left_position + " "  + current_top_position);
+   move = false;
+   }
+ }
+
+
+ function to_do_on_mousemove(e)
+   {
+   if(editmode == true)
+   {
+   if(what_to_do_on_mouse_move == "move_button")
+   {
+     //console.log("mouse is moving");
+     $("#"+moveid).css({top:e.pageY -topdiffrnce, left:e.pageX-leftdiffrnce});
+     setmarker();
+   }
+
+   else if(what_to_do_on_mouse_move == "resize_rt_button")
+   {
+     var delta;
+     var btn_left_position = $("#"+moveid).offset().left;
+     var width = $("#"+moveid).width();
+     delta = (e.pageX-(width+ btn_left_position));
+     var finalwidth = width + delta;
+     $("#"+moveid).css({width:finalwidth});
+     setmarker();
+   }
+
+   else if(what_to_do_on_mouse_move == "resize_lt_button")
+   {
+     var delta_l;
+     var btn_position_x = $("#"+moveid).offset().left;
+     var width = $("#"+moveid).width();
+     delta_l = btn_position_x - e.pageX;
+     var newposition = btn_position_x - delta_l;
+     $("#"+moveid).css({ left : newposition});
+     var finalwidth = (width + delta_l);
+     $("#"+moveid).css({width:finalwidth});
+     setmarker();
+   }
+
+   else if(what_to_do_on_mouse_move == "resize_dwn_button")
+     {
+       var delta;
+       var btn_position_y = $("#"+moveid).offset().top;
+       console.log(btn_position_y);
+       var height = $("#"+moveid).height();
+       console.log(height);
+       delta = e.pageY - (btn_position_y + height)
+       var finalheight = height + delta;
+       $("#"+moveid).css({height:finalheight});
+       setmarker();
+     }
+
+   else if(what_to_do_on_mouse_move == "resize_up_button")
+   {
+     var delta;
+     var btn_position_y = $("#"+moveid).offset().top;
+     console.log(btn_position_y);
+     var height = $("#"+moveid).height();
+     delta = btn_position_y-e.pageY;
+     console.log(delta);
+     var newposition = btn_position_y - delta;
+     $("#"+moveid).css({top : newposition});
+     var finalheight = height + delta;
+     $("#"+moveid).css({height:finalheight});
+     setmarker();
+   }
+
+   else
+    {
+
+    }
+
+ move = false;
+
+ }
+ }
+
+ function to_do_on_mouseup(e)
+ {
+   if(editmode == true)
+    {
+    what_to_do_on_mouse_move = "";
+    var top =  $("#"+moveid).css("top");
+    var left = $("#"+moveid).css("left");
+    var width = $("#"+moveid).css("width");
+    var height = $("#"+moveid).css("height");
+    var x = $("#"+moveid).offset().left;
+    //console.log(width);
+    //console.log(top + " " + x);
+
+    //$.post('/abc',{name :"bharat",a:"1",test:JSON.stringify(json),nameofid:JSON.stringify(json.buttons.id)},top_and_left);
+    getindex = $("#"+moveid).attr("index");
+    //console.log(getindex);
+    json.buttons[getindex].top = top;
+    json.buttons[getindex].left = left;
+    json.buttons[getindex].width = width;
+    json.buttons[getindex].height = height;
+
+    var finalleft_position = $("#"+moveid).offset().left;
+    var finaltop_position = $("#"+moveid).offset().top;
+    console.log(finalleft_position + " " + finaltop_position);
+
+
+    move = true;
+    if(move==true)
+    {
+      $("#"+moveid).click(function(){
+          console.log("you have clicked");
+          if(current_top_position==finaltop_position && current_left_position==finalleft_position)
+          {
+           $("#load").hide();
+           $("#pageofclickedbutton").show();
+            document.getElementById('button_property').innerHTML = (width + " " + height + " " + moveid);
+            //$('#pageofclickedbutton').html(width + " " + height + " " + moveid);
+            if (document.getElementById('text').checked)
+              {
+
+              }
+            else if (document.getElementById('image').checked)
+              {
+
+              }
+            else
+              {
+
+              }
+            }
+        });
+    }
+  }
+ }
+
+
+  $("#load").mouseup(to_do_on_mouseup);
+  $("#load").mousemove(to_do_on_mousemove);
+
+// $(".myclass").mousedown(to_do_on_mousedown);
+
+$("#btn").click(function(){
+  console.log("button is clicked");
+  console.log(json.buttons);
+  $.post('/abc',{nameoffile:"jsonfile",jsondata:JSON.stringify(json)},on_response_for_abc);
+});
+
+function idgenerator(){
+  var randLetter = String.fromCharCode(65 + Math.floor(Math.random() * 26));
+  var uniqid = randLetter + Date.now();
+  return uniqid;
+}
+
+$("#btn2").click(function(){
+  var idb = idgenerator();
+  var obj = {"width":140,"height":40,"top":"300px","left":"200px","id":idb};
+  json.buttons.push(obj);
+  loopjson();
+  //var divstr = '<div id="'  +  obj.id  +  '" style="width:' + obj.width +'px'+ ';'+' height:' + obj.height + 'px' +';' + ' left:' + obj.left + 'px'+ ';'+ ' top:' + obj.top + 'px' + ';' + '"' + '>'+ 'btn'+'</div>';
+
+  //console.log(divstr);
+  //$("#load").append( divstr );
+//<div id='4' style="width:30px; height:40px;top: 300px;left:200px" ></div>
+  //$.post('/abc',{nameoffile2:"jsonfile2",jsondata2: JSON.stringify(json)},on_response_for_abc);
+});
+
+var newmmarkertop;
+var newmmarkerleft;
+var newmmarkerwidth;
+var newmmarkerheight;
+
+function setmarker()
+{
+   newmmarkertop = $("#"+moveid).offset().top - 4;
+   newmmarkerleft = $("#"+moveid).offset().left - 4;
+   newmmarkerwidth = $("#"+moveid).width() + 14;
+   newmmarkerheight = $("#"+moveid).height() + 14;
+
+ $("#marker").css( {position:"absolute", top:newmmarkertop, left:newmmarkerleft ,width:newmmarkerwidth,height:newmmarkerheight});
+
+}
+
+
+/*
+$.getJSON("index.json", function(json){
+for( var i=0;i<11;i++)
+{
+  $("#load").append("<div>test</div>");
+}
+});
+*/
+
+ var employee = {
+   "saurav" :
+   {
+     "firstname" : "saurav",
+     "lastname" : "tiwari",
+      "gender"   : "male",
+     "salary"   : 50000
+    },
+    "amit":
+    {
+        "fiestname" : "amit",
+        "lastname"  : "singh",
+        "gender"    : "male",
+        "salary"    : 80000
+    }
+  };
+
+// $('#divresult').html(employee.saurav.lastname);
+// $.getJSON( "index.json", function(json) {
+  // console.log( json.saurav.firstname );
+ //});
+function on_response_for_abc(res_data){
+  console.log(res_data);
+}
+
+function top_and_left(reply){
+  console.log(reply);
+}
+
+$("#contolbtn").hide();
+$("#close").hide();
+var count = 0;
+/*
+$("#setting").click(function(){
+  editmode = false;
+  $("#contolbtn").toggle();
+  count = count +1;
+  if(count%2!=0)
+  {
+  editmode = true;
+  }
+  else
+  {
+    editmode = false;
+  }
+});
+*/
+$("#edit").hide();
+$("#back").hide();
+$("#to_the_top_of_load").hide();
+var n = 0;
+
+$('#minions').click(function() {
+    $("#load").hide();
+    $("#to_the_top_of_load").show();
+    $("#edit").show();
+    $("#back").show();
+});
+
+var count_edit = 0; ;
+
+$("#edit").click(function(){
+  $("#to_the_top_of_load").hide();
+  editmode = true;
+  $("#load").show();
+  $("#contolbtn").show();
+  $("#close").show();
+  $("#minions").hide();
+});
+
+$("#back").click(function(){
+  $("#to_the_top_of_load").hide();
+  $("#load").show();
+  $("#contolbtn").hide();
+  $("#close").hide();
+});
+
+$("#close").click(function(){
+  $("#minions").show();
+  editmode = false;
+});
+
+$("#pageofclickedbutton").hide();
+
+</script>
+</body>
+</html>

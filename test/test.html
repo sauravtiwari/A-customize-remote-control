@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title></title>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+</head>
+<body id="body">
+<style>
+  .buttoncss
+  {
+    float:left;
+  }
+</style>
+
+<button type="button" id="showbutton">drawwidgetforeground</button>
+
+<div id="drawwidget" style="display:none;position:absolute;top:0px;left:0px;opacity:1;background-color:black">
+
+  <div id="drawwidgetforeground" style="width:80%;margin:auto;margin-top:10%;height:80%;background-color:white;opacity:1">
+
+    <div id="drawbuttons" style="height:20px">
+
+        <div id="undo" class="buttoncss">
+        <button type="button" style="background-color:#778384">undo</button>
+        </div>
+
+        <div id="red" class="buttoncss">
+        <button type="button" style="background-color:red"> red </button>
+        </div>
+
+        <div id="blue" class="buttoncss">
+        <button type="button" style="background-color:blue"> blue </button>
+        </div>
+
+        <div id="yellow" class="buttoncss">
+        <button type="button" style="background-color:yellow"> yellow </button>
+        </div>
+
+        <div id="pink" class="buttoncss">
+        <button type="button" style="background-color:#E359CA"> pink </button>
+        </div>
+
+        <div id="clear" class="buttoncss">
+        <button type="button" style="background-color:#717D7E">clear</button>
+        </div>
+
+        <button id="hidedrawwidget" style="float:right;">X</button>
+
+        <button id="save" style="float:right">save</button>
+    </div>
+     <br />
+   <div id="canvasDiv" style="background-color:pink;bottom:0"></div>
+
+ </div>
+
+</div>
+
+
+<style>
+    #canvas{
+    border:1px solid black;
+    /*margin-left: 200px;
+    margin-top: 200px;*/
+    }
+</style>
+
+<script>
+
+    var canvasDiv = document.getElementById('canvasDiv');
+    canvas = document.createElement('canvas');
+    //canvas.setAttribute('width', 490);
+
+    canvas.setAttribute('id', 'canvas');
+    //  canvas.setAttribute('border','3px');
+    canvasDiv.appendChild(canvas);
+    if(typeof G_vmlCanvasManager != 'undefined')
+    {
+      canvas = G_vmlCanvasManager.initElement(canvas);
+    }
+
+    $(document).ready(function(){
+      var x = $('#canvasDiv').width();
+      console.log(x);
+      var y = $('#body').width();
+      console.log(y);
+      var windh = $(window).height();
+      var windw = $(window).width();
+      console.log(windh+","+windw);
+      $('#drawwidget').css("width",windw);
+      $('#drawwidget').css("height",windh);
+      $("#canvasDiv").css("height",(windh*0.8)-20);
+      console.log($("#drawwidgetforeground").height());
+      //$('#canvas').css("height",(windh*0.8)-20);
+
+      canvas.setAttribute('height', (windh*0.8)-20);
+      canvas.setAttribute('width',(windw*0.8));
+      context = canvas.getContext("2d");
+    });
+
+
+    $('#canvas').mousedown(function(e){
+      var mouseX = e.pageX - this.offsetLeft;
+      var mouseY = e.pageY - this.offsetTop;
+      paint = true;
+      addClick(e.pageX - this.offsetLeft, e.pageY - this.offsetTop,false);
+      redraw();
+    });
+
+    $('#canvas').mousemove(function(e){
+      if(paint)
+      {
+        addClick(e.pageX - this.offsetLeft, e.pageY - this.offsetTop, true);
+        redraw();
+      }
+    });
+
+    $('#canvas').mouseup(function(e){
+      paint = false;
+    });
+
+    $('#canvas').mouseleave(function(e){
+      paint = false;
+    });
+
+    var clickX = new Array();
+    var clickY = new Array();
+    var clickDrag = new Array();
+    var paint;
+    var currentcolor = new Array();
+
+    function addClick(x, y, dragging)
+    {
+      clickX.push(x);
+      clickY.push(y);
+      clickDrag.push(dragging);
+      currentcolor.push(colour);
+      console.log(dragging);
+    }
+
+    //  var cleartext = true;
+    function redraw()
+    {
+      context.clearRect(0, 0, context.canvas.width, context.canvas.height); // Clears the canvas
+      context.lineJoin = "round";
+      context.lineWidth = 5;
+
+      for(var i=0; i < clickX.length; i++)
+      {
+        context.strokeStyle = currentcolor[i];
+        context.beginPath();
+        if(clickDrag[i] && i)
+        {
+           context.moveTo(clickX[i-1], clickY[i-1]);
+        }
+        else
+        {
+          context.moveTo(clickX[i]-1, clickY[i]);
+        }
+        context.lineTo(clickX[i], clickY[i]);
+        context.closePath();
+        context.stroke();
+      }
+    }
+
+    $('#hidediv').click(function(){
+    $("#canvasDiv").hide();
+    $("#allcolorbuttons").hide();
+    });
+
+    $('#showdiv').click(function(){
+    $("#canvasDiv").show();
+    $('#allcolorbuttons').show();
+    });
+
+    var colour="black";
+
+    $('#red').click(function(){
+    colour = "red";
+    });
+
+    $('#blue').click(function(){
+    colour = "blue";
+    });
+
+    $('#yellow').click(function(){
+    colour = "yellow";
+    });
+
+    $('#pink').click(function(){
+    colour = "pink";
+    });
+
+    $('#clear').click(function(){
+      context.clearRect(0, 0, context.canvas.width, context.canvas.height);
+      clickX.length = 0;
+      clickY.length = 0;
+      clickDrag.length = 0;
+      currentcolor.length = 0;
+    });
+
+    $("#undo").click(function(){
+      var i;
+      for(i=clickX.length-1;i>=0;i--)
+      {
+        console.log(i + ', '+ clickDrag[i]);
+        if(clickDrag[i]==false)
+        {
+          console.log(i);
+          break;
+        }
+       }
+      console.log(i);
+      clickX.splice(i,clickX.length-i);
+      clickY.splice(i,clickY.length-i);
+      currentcolor.splice(i,currentcolor.length-i);
+      clickDrag.splice(i,clickDrag.length-i);
+      redraw();
+    });
+
+    //$('#drawbuttons').show();
+    //$('#canvasDiv').show();
+
+    $('#drawwidgetforeground').click(function(){
+      $('canvasDiv').show();
+      $('#drawbuttons').show();
+    });
+
+    $('#showbutton').click(function(){
+      $('#drawwidget').show();
+    });
+
+    $('#hidedrawwidget').click(function(){
+      $('#drawwidget').hide();
+    });
+
+    $('#save').click(function(){
+      //  var imgw = canvas.getAttribute('height', (windh*0.8)-20);
+      //  var imgh = canvas.getAttribute('width',(windw*0.8));
+      var imagedata = canvas.toDataURL();
+      $.post('/fgh',{nameofimgfile:"imgfile.png",imgdata:imagedata},image_of_canvas);
+    });
+
+    function image_of_canvas(response_data){
+      console.log(response_data);
+    }
+
+</script>
+</body>
+</html>
