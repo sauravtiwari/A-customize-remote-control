@@ -35,14 +35,23 @@
   <div id="pageofclickedbutton" style="position:absolute;width:1000px; height:1000px;background-color:rgba(244, 113, 66,0.9);opacity:0.9">
   <div id="pageofclickedbutton_2" style="width:80%;margin:auto;margin-top:10%;height:80%;background-color:rgba(255,255,255,1);">
   <div id="button_property"></div>
-  <button type="button" style="float:right;position:top">X</button>
-  <button type="button" style="float:right;position:top">save</button>
-  <form>
-  <input id="text" type="radio"  name="type" value="text" > Text<br>
-  <input id="image" type="radio" name="type" value="image"> Image<br>
-  <input id="other" type="radio" name="type" value="other" checked> Other<br>
-  </form>
-  <div id="result" style="width:80%;margin:auto;margin-top:10%;height:80%;background-color:rgba(289,259,268,1);"></div>
+
+  <div>
+  <input id="text" type="radio"  name="type" value="text" > Text
+  <input id="image" type="radio" name="type" value="image"> Image
+  <input id="other" type="radio" name="type" value="other" checked> Other
+ </div>
+  <div id="drawbuttons" style="height:20px">
+    <button id="red" type="button" style="background-color:red"> red </button>
+    <button id="blue" type="button" style="background-color:blue">blue</button>
+    <button id="yellow" type="button" style="background-color:yellow">yellow</button>
+    <button id="violet" type="button" style="background-color:#C71585">violet</button>
+    <button id="clear" type="button">clear</button>
+    <button id="undo" type="button">undo</button>
+    <button type="button" style="float:right;position:top">X</button>
+    <button type="button" style="float:right;position:top">save</button>
+  </div>
+   <div id="canvasDiv" style="background-color:pink"></div>
   </div>
   </div>
 
@@ -56,6 +65,12 @@
      border-style: solid;*/
      border: 5px solid black;
   }
+
+  #canvas
+  {
+    border:1px solid black;
+  }
+
 </style>
 
 <script type="text/javascript">
@@ -117,7 +132,7 @@ function loopjson()
 });
 });
 
-var editmode = false;
+ var editmode = false;
  var leftdiffrnce , topdiffrnce;
  var width;
  var what_to_do_on_mouse_move = "";
@@ -304,24 +319,143 @@ var editmode = false;
            $("#pageofclickedbutton").show();
             document.getElementById('button_property').innerHTML = (width + " " + height + " " + moveid);
             //$('#pageofclickedbutton').html(width + " " + height + " " + moveid);
-            if (document.getElementById('text').checked)
-              {
-
-              }
-            else if (document.getElementById('image').checked)
-              {
-
-              }
-            else
-              {
-
-              }
+            $("#canvasDiv").show();
             }
         });
     }
   }
  }
 
+    var canvasDiv = document.getElementById('canvasDiv');
+    canvas = document.createElement('canvas');
+    canvas.setAttribute('id', 'canvas');
+    canvasDiv.appendChild(canvas);
+
+    var x = $('#canvasDiv').width();
+    console.log(x);
+
+    var windh = $(window).height();
+    var windw = $(window).width();
+    console.log(windh+","+windw);
+
+    $('#pageofclickedbutton').css("width",windw);
+    $('#pageofclickedbutton').css("height",windh);
+    $("#canvasDiv").css("height",(windh*0.8)-100);
+
+    canvas.setAttribute('height', (windh*0.8)-100);
+    canvas.setAttribute('width',(windw*0.8));
+    context = canvas.getContext("2d");
+
+    var colour="black";
+    var paint;
+
+    $('#canvas').mousedown(function(e){
+      var mouseX = e.pageX - this.offsetLeft;
+      var mouseY = e.pageY - this.offsetTop;
+      paint = true;
+      addClick(e.pageX - this.offsetLeft, e.pageY - this.offsetTop,false);
+      redraw();
+    });
+
+    $('#canvas').mousemove(function(e){
+      if(paint)
+      {
+        addClick(e.pageX - this.offsetLeft, e.pageY - this.offsetTop, true);
+        redraw();
+      }
+    });
+
+    $('#canvas').mouseup(function(e){
+      paint = false;
+    });
+
+    $('#canvas').mouseleave(function(e){
+      paint = false;
+    });
+
+
+    var clickX = new Array();
+    var clickY = new Array();
+    var clickDrag = new Array();
+    var currentcolor = new Array();
+
+    function addClick(x, y, dragging)
+    {
+      clickX.push(x);
+      clickY.push(y);
+      clickDrag.push(dragging);
+      currentcolor.push(colour);
+      console.log(dragging);
+    }
+
+    function redraw()
+    {
+      context.clearRect(0, 0, context.canvas.width, context.canvas.height); // Clears the canvas
+      context.lineJoin = "round";
+      context.lineWidth = 5;
+
+      for(var i=0; i < clickX.length; i++)
+      {
+        context.strokeStyle = currentcolor[i];
+        context.beginPath();
+        if(clickDrag[i] && i)
+        {
+           context.moveTo(clickX[i-1], clickY[i-1]);
+        }
+        else
+        {
+          context.moveTo(clickX[i]-1, clickY[i]);
+        }
+        context.lineTo(clickX[i], clickY[i]);
+        context.closePath();
+        context.stroke();
+      }
+    }
+
+    $('#red').click(function(){
+    colour = "red";
+    });
+
+    $('#blue').click(function(){
+    colour = "blue";
+    });
+
+    $('#yellow').click(function(){
+    colour = "yellow";
+    });
+
+    $('#violet').click(function(){
+    colour = "#C71585";
+    });
+
+    $('#clear').click(function(){
+      context.clearRect(0, 0, context.canvas.width, context.canvas.height);
+      clickX.length = 0;
+      clickY.length = 0;
+      clickDrag.length = 0;
+      currentcolor.length = 0;
+    });
+
+    $("#undo").click(function(){
+      var i;
+      for(i=clickX.length-1;i>=0;i--)
+      {
+        console.log(i + ', '+ clickDrag[i]);
+        if(clickDrag[i]==false)
+        {
+          console.log(i);
+          break;
+        }
+       }
+      console.log(i);
+      clickX.splice(i,clickX.length-i);
+      clickY.splice(i,clickY.length-i);
+      currentcolor.splice(i,currentcolor.length-i);
+      clickDrag.splice(i,clickDrag.length-i);
+      redraw();
+    });
+
+    $("#canvasDiv").hide();
 
   $("#load").mouseup(to_do_on_mouseup);
   $("#load").mousemove(to_do_on_mousemove);
