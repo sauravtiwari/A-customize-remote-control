@@ -34,13 +34,24 @@
 
   <div id="pageofclickedbutton" style="position:absolute;width:1000px; height:1000px;background-color:rgba(244, 113, 66,0.9);opacity:0.9">
   <div id="pageofclickedbutton_2" style="width:80%;margin:auto;margin-top:10%;height:80%;background-color:rgba(255,255,255,1);">
+
+  <div id="X_save" style="position:top;float:right">
+    <button id="X" type="button" style="float:right;position:top">X</button>
+    <button id="save" type="button" style="float:right;position:top">save</button>
+  </div>
+
   <div id="button_property"></div>
 
   <div>
-  <input id="text" type="radio"  name="type" value="text" > Text
-  <input id="image" type="radio" name="type" value="image"> Image
-  <input id="other" type="radio" name="type" value="other" checked> Other
- </div>
+    <input id="text" type="radio"  name="type" value="text" > Text
+    <input id="image" type="radio" name="type" value="image"> Image
+    <input id="other" type="radio" name="type" value="other" checked> Other
+  </div>
+
+  <div>
+    Text:<input id="abouttext" type="text"  text="write somthing" value="something"></input><br>
+  </div>
+
   <div id="drawbuttons" style="height:20px">
     <button id="red" type="button" style="background-color:red"> red </button>
     <button id="blue" type="button" style="background-color:blue">blue</button>
@@ -48,8 +59,6 @@
     <button id="violet" type="button" style="background-color:#C71585">violet</button>
     <button id="clear" type="button">clear</button>
     <button id="undo" type="button">undo</button>
-    <button type="button" style="float:right;position:top">X</button>
-    <button type="button" style="float:right;position:top">save</button>
   </div>
    <div id="canvasDiv" style="background-color:pink"></div>
   </div>
@@ -92,7 +101,6 @@ function loopjson()
     $('#'+json.buttons[i].id).attr("index",i);
 
     moveid = json.buttons[i].id;
-    click_id = json.buttons[i].id;
 
     $("#"+json.buttons[i].id).css({
         top: json.buttons[i].top,
@@ -114,10 +122,9 @@ function loopjson()
 
 }
 
-
+ var moveid;
+ var getindex;
  $(document).ready(function(){
-   var moveid;
-   var getindex;
    var move;
    $.getJSON( "index.json", function(jsonp) {
       json = jsonp;
@@ -307,7 +314,6 @@ function loopjson()
     var finaltop_position = $("#"+moveid).offset().top;
     console.log(finalleft_position + " " + finaltop_position);
 
-
     move = true;
     if(move==true)
     {
@@ -440,7 +446,7 @@ function loopjson()
       var i;
       for(i=clickX.length-1;i>=0;i--)
       {
-        console.log(i + ', '+ clickDrag[i]);
+        //console.log(i + ', '+ clickDrag[i]);
         if(clickDrag[i]==false)
         {
           console.log(i);
@@ -456,6 +462,32 @@ function loopjson()
     });
 
     $("#canvasDiv").hide();
+    getindex = $("#"+moveid).attr("index");
+
+    $("#save").click(function(){
+      //var newtext = "text";
+      var text = $("#abouttext").val();
+      //json.buttons[1][newtext] = text;
+      json.buttons[getindex].text = text;
+      //$.post('/mno',{nameoftextfile:"text",text_data:text},value_of_text);
+      var imagedataofimg = "img";
+      var imagedata = canvas.toDataURL();
+      json.buttons[getindex].img_data  = imagedata;
+      //  json.buttons[1][imagedataofimg] = imagedata;
+      //json.buttons.push(imagedata);
+      $.post('/abc',{nameoffile:"jsonfile",jsondata:JSON.stringify(json)},on_response_for_abc);
+      $.post('/ijk',{nameofimgfile:"imgfile.png",imgdata:imagedata},image_of_canvas);
+    });
+
+    function value_of_text(response_text)
+    {
+      console.log(response_text);
+    }
+
+   function image_of_canvas(response_data)
+   {
+     console.log(response_data);
+   }
 
   $("#load").mouseup(to_do_on_mouseup);
   $("#load").mousemove(to_do_on_mousemove);

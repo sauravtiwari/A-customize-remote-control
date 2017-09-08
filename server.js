@@ -24,6 +24,15 @@ app.post('/fgh',function(req, res){
   fs.writeFile(req.body.nameofimgfile,Datatosave,'base64');
 });
 
+app.post('/ijk',function(req,res){
+  var Datatosaveofimage = req.body.imgdata.replace(/^data:image\/png;base64,/, "");
+  fs.writeFile(req.body.nameofimgfile,Datatosaveofimage,'base64');
+});
+
+app.post('/mno',function(req,res){
+  fs.writeFile(req.body.nameoftextfile,req.body.text_data);
+});
+
 app.get('/def',function(req,res){
   res.send('you got it');
 });
