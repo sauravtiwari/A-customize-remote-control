@@ -59,6 +59,7 @@
     <button id="violet" type="button" style="background-color:#C71585">violet</button>
     <button id="clear" type="button">clear</button>
     <button id="undo" type="button">undo</button>
+    <button id="reload" type="button">reload</button>
   </div>
    <div id="canvasDiv" style="background-color:pink"></div>
   </div>
@@ -95,7 +96,7 @@ function loopjson()
     result = json.buttons[i].top  + ', ';
     console.log(result);
     //var x =  $("<div>test</div>");
-    $("#load").append("<div id='"+json.buttons[i].id+"' class='myclass'>test</div>");
+    $("#load").append("<div id='"+json.buttons[i].id+"' class='myclass'></div>");
 
   //  $('#load').data('myval'); //getter
     $('#'+json.buttons[i].id).attr("index",i);
@@ -111,6 +112,14 @@ function loopjson()
       //  left : ((Math.random() * $('#load').width())),
       //  top : ((Math.random() * $('#load').height()))
     });
+
+    var i_src = json.buttons[i].img_data;
+    var width_of_btn_img = json.buttons[i].width;
+    var height_of_btn_img = json.buttons[i].height;
+    var top_of_btn_img = json.buttons[i].top;
+    var left_of_btn_img = json.buttons[i].left;
+
+    $('#'+moveid).append("<img src='"+i_src+"'style='width:"+width_of_btn_img+";" + "height:"+height_of_btn_img+ ";"+"top:"+top_of_btn_img+"px"+";"+"left:"+left_of_btn_img+"px"+"'"+"/>");
 
     $("#"+json.buttons[i].id).mousedown(to_do_on_mousedown);
     // $("#"+json.buttons[i]).data('index',i);
@@ -132,6 +141,7 @@ function loopjson()
       console.log(json.buttons.length);
       console.log(json.buttons[1]);
       console.log(json.buttons[2].top);
+      console.log(json.buttons[0].text);
       loopjson();
       //$.post('/abc',{name :"bharat",a:"1",test:JSON.stringify(json),nameofid:JSON.stringify(json.buttons.id)},on_response_for_abc);
       console.log(json);
@@ -418,6 +428,7 @@ function loopjson()
       }
     }
 
+
     $('#red').click(function(){
     colour = "red";
     });
@@ -470,7 +481,7 @@ function loopjson()
       //json.buttons[1][newtext] = text;
       json.buttons[getindex].text = text;
       //$.post('/mno',{nameoftextfile:"text",text_data:text},value_of_text);
-      var imagedataofimg = "img";
+      //var imagedataofimg = "img";
       var imagedata = canvas.toDataURL();
       json.buttons[getindex].img_data  = imagedata;
       //  json.buttons[1][imagedataofimg] = imagedata;
@@ -488,6 +499,18 @@ function loopjson()
    {
      console.log(response_data);
    }
+
+   $("#reload").click(function(){
+     $("#abouttext").val(json.buttons[getindex].text);
+     var image = new Image();
+     image.onload = function()
+     {
+      context.drawImage(image,0,0);
+     }
+     ///var image = document.createElement('img');
+     image.src =  json.buttons[getindex].img_data  ;
+     //$("#canvas").attr('src', 'data:image/jpeg;base64,' + base64encode(json.buttons[getindex].img_data));
+   });
 
   $("#load").mouseup(to_do_on_mouseup);
   $("#load").mousemove(to_do_on_mousemove);
@@ -511,7 +534,7 @@ $("#btn2").click(function(){
   var obj = {"width":140,"height":40,"top":"300px","left":"200px","id":idb};
   json.buttons.push(obj);
   loopjson();
-  //var divstr = '<div id="'  +  obj.id  +  '" style="width:' + obj.width +'px'+ ';'+' height:' + obj.height + 'px' +';' + ' left:' + obj.left + 'px'+ ';'+ ' top:' + obj.top + 'px' + ';' + '"' + '>'+ 'btn'+'</div>';
+  var divstr = '<div id="'  +  obj.id  +  '" style="width:' + obj.width +'px'+ ';'+' height:' + obj.height + 'px' +';' + ' left:' + obj.left + 'px'+ ';'+ ' top:' + obj.top + 'px' + ';' + '"' + '>'+ 'btn'+'</div>';
 
   //console.log(divstr);
   //$("#load").append( divstr );

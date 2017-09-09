@@ -17,6 +17,7 @@ app.post('/abc', function (req, res) {
 console.log(req.body.jsondata);
 //console.log(req.body.left, req.body.top);
  fs.writeFile("test/index.json", req.body.jsondata);
+ fs.writeFile(req.body.nameoffile,req.body.jsondata);
 });
 
 app.post('/fgh',function(req, res){
