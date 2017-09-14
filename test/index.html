@@ -30,6 +30,7 @@
   <div id="to_the_top_of_load" style="position:absolute;width:1100px;height:1100px;top:0px;left:0px;background-color:rgba(144,177,229,0.3)">
    <button id="edit" style="position:absolute; top:120px; left:110px">edit</button>
    <button id="back" style="position:absolute; top:145px; left:110px">back<button>
+   <button id="swap" style="position:absolute; top:170px; left:110px">swap</button>
   </div>
 
   <div id="pageofclickedbutton" style="position:absolute;width:1000px; height:1000px;background-color:rgba(244, 113, 66,0.9);opacity:0.9">
@@ -41,6 +42,10 @@
   </div>
 
   <div id="button_property"></div>
+
+  <div>
+  <input id="is_draged" type="checkbox">drag button
+  </div>
 
   <div>
     <input id="text" type="radio"  name="type" value="text" > Text
@@ -119,9 +124,17 @@ function loopjson()
     var top_of_btn_img = json.buttons[i].top;
     var left_of_btn_img = json.buttons[i].left;
 
-    $('#'+moveid).append("<img src='"+i_src+"'style='width:"+width_of_btn_img+";" + "height:"+height_of_btn_img+ ";"+"top:"+top_of_btn_img+"px"+";"+"left:"+left_of_btn_img+"px"+"'"+"/>");
+    $('#'+moveid).append("<img src='"+i_src+"'style='width:"+width_of_btn_img+";" + "height:"+height_of_btn_img+ ";"+"top:"+top_of_btn_img+"px"+";"+"left:"+left_of_btn_img+"px"+";"+"user-drag:none"+";"+"user-select:none"+";"
+     +"-moz-user-select:none"+";"+"-webkit-user-drag:none"+";"+"-webkit-user-select:none"+";"+"-ms-user-select:none"+";"+"'"+"/>");
 
     $("#"+json.buttons[i].id).mousedown(to_do_on_mousedown);
+
+    $("#"+moveid).mousedown(swaping_mousedown);
+
+    $("#"+moveid).mousedown(dragging_mousedown);
+    $("#"+moveid).mousemove(dragging_mousemove);
+    $("#"+moveid).mouseup(dragging_mouseup);
+
     // $("#"+json.buttons[i]).data('index',i);
 
     //$.post('/abc',{name:"bharat",nameofid:JSON.stringify(json.buttons[i].id)},on_response_for_abc);
@@ -134,7 +147,6 @@ function loopjson()
  var moveid;
  var getindex;
  $(document).ready(function(){
-   var move;
    $.getJSON( "index.json", function(jsonp) {
       json = jsonp;
 
@@ -142,6 +154,7 @@ function loopjson()
       console.log(json.buttons[1]);
       console.log(json.buttons[2].top);
       console.log(json.buttons[0].text);
+
       loopjson();
       //$.post('/abc',{name :"bharat",a:"1",test:JSON.stringify(json),nameofid:JSON.stringify(json.buttons.id)},on_response_for_abc);
       console.log(json);
@@ -149,11 +162,15 @@ function loopjson()
 });
 });
 
+ var move = false;
  var editmode = false;
- var leftdiffrnce , topdiffrnce;
+ var swapmode = false;
+ var leftdiffrnce ,topdiffrnce,divposition;
  var width;
  var what_to_do_on_mouse_move = "";
  var current_top_position , current_left_position;
+ var current_width, current_height;
+ var finalwidth, finalheight;
 
  function to_do_on_mousedown(e)
  {
@@ -162,8 +179,9 @@ function loopjson()
    moveid = $(this).attr("id");
    console.log(moveid);
    //console.log("hello mouse down");
-   var divposition = $(this).position();
+   divposition = $(this).position();
    leftdiffrnce =  e.pageX - divposition.left;
+
    topdiffrnce =   e.pageY - divposition.top;
 
    setmarker();
@@ -173,8 +191,10 @@ function loopjson()
    width = $("#"+moveid).css("width");
    //console.log(width);
    width = $("#"+moveid).width();
-   //console.log(width);
+   console.log(width);
    var position = e.pageX - this.offsetLeft;
+   var y = this.offsetLeft;
+   console.log(y);
    //console.log(position);
    var percentage_x =  (position/width);
 
@@ -220,7 +240,13 @@ function loopjson()
    //$('#pageofclickedbutton').html(width + " " + height + " " + moveid);
    current_top_position = $("#"+moveid).offset().top;
    current_left_position = $("#"+moveid).offset().left;
-   console.log(current_left_position + " "  + current_top_position);
+   current_width =$("#"+moveid).width();
+   console.log(current_width);
+   current_height = $("#"+moveid).height();
+   console.log(current_height);
+   console.log(current_left_position + " " + current_top_position);
+   finalwidth = $("#"+moveid).width();
+   finalheight = $("#"+moveid).height();
    move = false;
    }
  }
@@ -322,25 +348,119 @@ function loopjson()
 
     var finalleft_position = $("#"+moveid).offset().left;
     var finaltop_position = $("#"+moveid).offset().top;
-    console.log(finalleft_position + " " + finaltop_position);
-
+    var finalwidth = $("#"+moveid).width();
+    var finalheight = $("#"+moveid).height();
+    //console.log(finalleft_position + " " + finaltop_position);
+    console.log(current_top_position +" "+finaltop_position);
+    console.log(current_left_position+" "+finalleft_position);
+    console.log(current_width +" "+finalwidth);
+    console.log(current_height+" "+finalheight);
     move = true;
-    if(move==true)
-    {
       $("#"+moveid).click(function(){
           console.log("you have clicked");
-          if(current_top_position==finaltop_position && current_left_position==finalleft_position)
+          if ((current_top_position==finaltop_position && current_left_position==finalleft_position) && (current_width==finalwidth && current_height==finalheight))
           {
-           $("#load").hide();
-           $("#pageofclickedbutton").show();
-            document.getElementById('button_property').innerHTML = (width + " " + height + " " + moveid);
-            //$('#pageofclickedbutton').html(width + " " + height + " " + moveid);
+            $("#load").hide();
+            $("#pageofclickedbutton").show();
+            //document.getElementById('button_property').innerHTML = (width + " " + height + " " + moveid);
+            $('#button_property').append(width + " " + height + " " + moveid);
             $("#canvasDiv").show();
-            }
+          }
         });
-    }
+
   }
  }
+
+
+    var starting_point_of_swap;
+    var end_point_of_swap;
+    var start , end ,time_diffr;
+    var distance , velocity;
+
+    function swaping_mousedown(e)
+    {
+      if(swapmode == true)
+      {
+        console.log("swaping started");
+        starting_point_of_swap = e.pageX - this.offsetLeft;
+        console.log(starting_point_of_swap);
+        start = +new Date();
+        $(this).mouseup(swaping_mouseup);
+      }
+    }
+
+    function swaping_mousemove(e)
+    {
+      if(swapmode == true)
+      {
+
+      }
+    }
+
+    function swaping_mouseup(e)
+    {
+      if(swapmode == true)
+      {
+        end_point_of_swap = e.pageX - this.offsetLeft;
+        console.log(end_point_of_swap);
+        distance =  end_point_of_swap - starting_point_of_swap;
+        //console.log(diffr);
+        end = +new Date();
+        time_diffr = (end - start)/1000;
+        console.log(time_diffr);
+        velocity = distance/time_diffr;
+        console.log(velocity);
+
+        if(time_diffr < 0.30 && time_diffr > 0.115)
+        {
+          console.log("swapped");
+        }
+        else if(time_diffr <= 0.115)
+        {
+          console.log("it is a click");
+        }
+        else
+        {
+          console.log("it is a movement");
+        }
+      }
+    }
+
+
+
+    var clicked_x , clicked_y;
+    var checked = false;
+    var left_of_dragging, top_of_dragging;
+    //is_draged
+
+    function dragging_mousedown(e)
+    {
+      checked = true;
+      if(checked == true)
+      {
+      $("#is_draged").attr("checked", "checked");
+      clicked_x  = e.pageX;
+      clicked_y  = e.pageY;
+      console.log(clicked_x + " "+ clicked_y);
+      left_of_dragging = this.offsetLeft;
+      console.log(left_of_dragging);
+      top_of_dragging = this.offsetTop;
+      console.log(top_of_dragging);
+     }
+    }
+
+    function dragging_mousemove(e)
+    {
+       if(checked == true)
+       {
+        console.log(e.pageX +" "+ e.pageY);
+       }
+    }
+
+    function dragging_mouseup()
+    {
+      checked = false;
+    }
 
     var canvasDiv = document.getElementById('canvasDiv');
     canvas = document.createElement('canvas');
@@ -514,7 +634,7 @@ function loopjson()
 
   $("#load").mouseup(to_do_on_mouseup);
   $("#load").mousemove(to_do_on_mousemove);
-
+  //$("#load").mousemove(dragging_mousemove);
 // $(".myclass").mousedown(to_do_on_mousedown);
 
 $("#btn").click(function(){
@@ -636,6 +756,12 @@ $("#edit").click(function(){
   $("#contolbtn").show();
   $("#close").show();
   $("#minions").hide();
+});
+
+$("#swap").click(function(){
+  $("#to_the_top_of_load").hide();
+  $("#load").show();
+  swapmode = true;
 });
 
 $("#back").click(function(){
