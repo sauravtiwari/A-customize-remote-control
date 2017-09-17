@@ -48,9 +48,8 @@
   </div>
 
   <div>
-    <input id="text" type="radio"  name="type" value="text" > Text
-    <input id="image" type="radio" name="type" value="image"> Image
-    <input id="other" type="radio" name="type" value="other" checked> Other
+    <input id="text" type="checkbox"  name="type" value="text" > Text
+    <input id="image" type="checkbox" name="type" value="image"> Image
   </div>
 
   <div>
@@ -176,6 +175,7 @@ function loopjson()
  {
    if(editmode == true)
    {
+   move = false;
    moveid = $(this).attr("id");
    console.log(moveid);
    //console.log("hello mouse down");
@@ -247,7 +247,6 @@ function loopjson()
    console.log(current_left_position + " " + current_top_position);
    finalwidth = $("#"+moveid).width();
    finalheight = $("#"+moveid).height();
-   move = false;
    }
  }
 
@@ -256,6 +255,9 @@ function loopjson()
    {
    if(editmode == true)
    {
+
+    move = true;
+
    if(what_to_do_on_mouse_move == "move_button")
    {
      //console.log("mouse is moving");
@@ -320,8 +322,6 @@ function loopjson()
 
     }
 
- move = false;
-
  }
  }
 
@@ -355,10 +355,10 @@ function loopjson()
     console.log(current_left_position+" "+finalleft_position);
     console.log(current_width +" "+finalwidth);
     console.log(current_height+" "+finalheight);
-    move = true;
+
       $("#"+moveid).click(function(){
           console.log("you have clicked");
-          if ((current_top_position==finaltop_position && current_left_position==finalleft_position) && (current_width==finalwidth && current_height==finalheight))
+          if(move == false)
           {
             $("#load").hide();
             $("#pageofclickedbutton").show();
@@ -486,6 +486,7 @@ function loopjson()
     var paint;
 
     $('#canvas').mousedown(function(e){
+      $("#image").attr("checked", "checked");
       var mouseX = e.pageX - this.offsetLeft;
       var mouseY = e.pageY - this.offsetTop;
       paint = true;
